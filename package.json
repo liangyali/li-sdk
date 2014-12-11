@@ -1,0 +1,18 @@
+{
+  "name": "li-sdk",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^0.9.0",
+    "li-urlpattern": "0.0.1",
+    "lodash": "^2.4.1",
+    "request": "^2.49.0"
+  },
+  "devDependencies": {
+    "grunt-config-dir": "^0.3.2",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-mocha-test": "^0.12.4",
+    "mocha": "^2.0.1",
+    "should": "^4.3.1"
+  }
+}
