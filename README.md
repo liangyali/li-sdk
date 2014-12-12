@@ -1,5 +1,4 @@
-#  [![Build Status](https://secure.travis-ci.org/liangyali/li-sdk.png?branch=master)](http://travis-ci.org/liangyali/li-sdk)
-   [![Coverage Status](https://coveralls.io/repos/liangyali/li-sdk/badge.png?branch=master)](https://coveralls.io/r/liangyali/li-sdk?branch=master)
+#  [![Build Status](https://secure.travis-ci.org/liangyali/li-sdk.png?branch=master)](http://travis-ci.org/liangyali/li-sdk)[![Coverage Status](https://coveralls.io/repos/liangyali/li-sdk/badge.png?branch=master)](https://coveralls.io/r/liangyali/li-sdk?branch=master)
 # Getting Started
 
 安装: `npm install li-sdk --save`
