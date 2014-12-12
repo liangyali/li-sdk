@@ -23,6 +23,7 @@ var client=new SDK(settings,routes);
 参数 | 说明 | 是否必填
 ------------ | ------------- | ------------
 baseUrl | api基础地址   | 必填
+request | 请求对象 function(requestOptions,callback) ; callback function(err,response,body){}   | 可选
 
 #####routes
 

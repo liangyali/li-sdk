@@ -8,7 +8,6 @@ module.exports = function (grunt) {
     });
 
     // register group tasks
-    grunt.registerTask('default', ['build']);
-    grunt.registerTask('build', ['jshint']);
+    grunt.registerTask('default', ['test']);
     grunt.registerTask('test', ['jshint', 'mochaTest']);
 };
