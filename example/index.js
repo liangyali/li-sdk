@@ -1,8 +1,9 @@
 /**
- * Created by liangyali on 14-12-12.
- */
+* Created by liangyali on 14-12-12.
+*/
 
-var Sdk=require('../lib/sdk');
+var Sdk = require('../lib/sdk');
+var co = require('co');
 
 
 var settings = {
@@ -13,54 +14,76 @@ var settings = {
 var routes = {
     "user.get": {
         method: "DELETE",
-        uri: "/user/list/:id"
+        uri: "/user/list/:id.:format/:enable"
     }};
-var apis = new Sdk(settings, routes);
+var api = new Sdk(settings, routes);
 
-apis.use(function (options, done) {
+api.use(function (options, done) {
     done(null, options);
 });
 
 
-//apis.preRequest(function (params, options) {
+//api.preRequest(function (params, options) {
 //    return {
 //        data: {sign: 'test001'}
 //    };
 //});
 
-apis.on('before', function (error, options) {
-    console.log('before-----------');
-    console.log(options);
-});
-
-apis.on('after', function (error, body) {
-    console.log('after-----------');
-    console.log(body);
-});
-apis.on('user.get:before', function (error, options) {
-    console.log(options);
-});
-
-apis.on('user.get:after', function (error, body) {
-    console.log(body);
-});
+//api.on('before', function (error, options) {
+//    console.log('before-----------');
+//    console.log(options);
+//});
+//
+//api.on('after', function (error, body) {
+//    console.log('after-----------');
+//    console.log(body);
+//});
+//api.on('user.get:before', function (error, options) {
+//    console.log(options);
+//});
+//
+//api.on('user.get:after', function (error, body) {
+//    console.log(body);
+//});
 
 var express = require('express');
 var app = express();
 
 
-app.delete('/user/list/:id', function (req, res) {
+app.delete('/user/list/:id/:enable', function (req, res) {
     var query = req.query;
-    res.json({status: true, id: query});
+    console.log(req.url);
+    res.json(query);
 });
+
+var Promise = require('promise');
 
 app.listen(8000, function () {
-    console.log('listened');
 
-    apis.user.get({id: 1000, format: 'json', enable: true}, function (error, result) {
+    Promise.all([
+        api.user.get({id: 1000, format: 'json', enable: true, tag: 'test'}),
+        api.user.get({id: 2000, format: 'xml', enable: false}),
+        api.user.get({id: 3000, format: 'js', enable: true})
+    ]).then(function (body) {
+        console.log(body);
+    }, function (error) {
         console.log(error);
-        console.log(result);
+    });
 
+    var p=api.user.get({id: 1000, format: 'json00', enable: true, tag: 'test'});
+
+    p.then(function(value){
+        console.log(value);
+    });
+
+    p.then(function(value){
+        console.log(value);
+    });
+    p.then(function(value){
+        console.log(value);
     });
 });
+
+
+
 

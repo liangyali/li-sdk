@@ -1,27 +1,38 @@
 "use strict";
 var SDK = require('../lib/sdk');
+require('should');
 
 function create() {
     var options = {
         baseUrl: 'http://127.0.0.1:3000',
         request: function (options, callback) {
+            if (options.uri === 'http://127.0.0.1:3000/product/get') {
+                return callback(new Error('error'));
+            }
             callback(null, {}, {status: true});
         }
     };
 
     var routes = {
-        "products.search": {
+        "product.search": {
             method: 'GET',
-            uri: '/products/search'
+            uri: '/product/search'
         },
-        "products.get": {
+        "product.search.create": {
+            method: 'POST',
+            uri: '/product/search'
+        },
+        "product.get": {
             method: 'GET',
-            uri: '/products/:id'
+            uri: '/product/get'
         }
     };
 
     return new SDK(options, routes);
 }
+
+var noop = function () {
+};
 
 describe('#sdk', function () {
 
@@ -33,9 +44,16 @@ describe('#sdk', function () {
                 return next(new Error('abort'), options);
             });
 
-            api.products.search({id: 100}, function (error, body) {
+            api.product.search({id: 100}).then(noop, function () {
                 done();
             });
+        });
+
+        it('type throw exception', function () {
+            var api = create();
+            (function () {
+                api.use(1);
+            }).should.throw();
         });
 
         it('测试中间件运行,中间件抛出异常', function (done) {
@@ -45,9 +63,10 @@ describe('#sdk', function () {
                 return next(new Error('abort'), options);
             });
 
-            api.products.search({id: 100}, function (error, body) {
-                done();
-            });
+            api.product.search({id: 100})
+                .then(noop, function () {
+                    done();
+                });
         });
 
         it('测试中间件运行,测试中间件设置值', function (done) {
@@ -59,23 +78,14 @@ describe('#sdk', function () {
             });
 
             api.use(function (options, next) {
-                var error = null;
-
-                if (options.tag) {
-                    error = new Error('tag');
-                } else {
-                    error = new Error('not tag');
-                }
-                return next(error, options);
+                options.tag.should.be.equal('tag');
+                return next(null, options);
             });
 
-            api.products.search({id: 100}, function (error, body) {
-                if (error.message === 'tag') {
+            api.product.search({id: 100})
+                .then(function () {
                     done();
-                } else {
-                    done(new Error());
-                }
-            });
+                });
         });
     });
 
@@ -89,14 +99,13 @@ describe('#sdk', function () {
             });
 
             api.on('before', function (error, options) {
-                if (options['_id']) {
-                    done();
-                } else {
-                    done(new Error());
-                }
+
+                options['_id'].should.be.ok;
+
             });
 
-            api.products.search({id: 100}, function (error, body) {
+            api.product.search({id: 100}).then(noop, function () {
+                done();
             });
         });
 
@@ -108,15 +117,12 @@ describe('#sdk', function () {
                 return next(new Error('abort'), options);
             });
 
-            api.on('products.search:before', function (error, options) {
-                if (options['_id']) {
-                    done();
-                } else {
-                    done(new Error());
-                }
+            api.on('product.search:before', function (error, options) {
+                options['_id'].should.be.ok;
             });
 
-            api.products.search({id: 100}, function (error, body) {
+            api.product.search({id: 100}).then(noop, function () {
+                done();
             });
         });
     });
@@ -127,36 +133,37 @@ describe('#sdk', function () {
             var api = create();
 
             api.on('after', function (error, body) {
-                if (body.status) {
-                    done();
-                } else {
-                    done(new Error());
-                }
+                body.status.should.be.true;
             });
 
-            api.products.search({id: 100});
+            api.product.search({id: 100}).then(function () {
+                done();
+            }, noop);
         });
 
-        it('should be invoke products.search:after', function (done) {
+        it('should be invoke product.search:after', function (done) {
             var api = create();
 
-            api.on('products.search:after', function (error, body) {
-                if (body.status) {
-                    done();
-                } else {
-                    done(new Error());
-                }
+            api.on('product.search:after', function (error, body) {
+                body.status.should.be.true;
             });
 
-            api.products.search({id: 100});
+            api.product.search({id: 100}).then(function () {
+                done();
+            }, noop);
         });
 
-        it('should invoke products.search and result status true', function (done) {
+        it('should invoke product.search and result status true', function (done) {
             var api = create();
 
-            api.products.search({id: 100}, function (error, body) {
+            api.product.search({id: 100}, function (error, body) {
                 done(body.status ? null : new Error());
             });
+
+            api.product.search({id: 100}).then(function (value) {
+                value.status.should.be.true;
+                done();
+            }, noop);
         });
 
 
@@ -170,11 +177,30 @@ describe('#sdk', function () {
                 next(new Error(), null);
             });
 
-            api.products.search({id: 100}, function (error, body) {
-                done(error ? null : true);
+            api.product.search({id: 100}).then(noop, function (value) {
+                done();
             });
+        });
+
+        it('products.search.create', function (done) {
+            var api = create();
+
+            api.product.search({id: 100}).then(function () {
+                done();
+            }, noop);
         });
     });
 
+    describe('#error ', function () {
+        it('error event', function (done) {
+            var api = create();
 
+
+            api.on('error', function (error, options) {
+                done();
+            });
+
+            api.product.get({id: 100, p: 110}).then();
+        });
+    });
 });
