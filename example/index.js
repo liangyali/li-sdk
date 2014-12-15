@@ -1,10 +1,8 @@
 /**
-* Created by liangyali on 14-12-12.
-*/
+ * Created by liangyali on 14-12-12.
+ */
 
 var Sdk = require('../lib/sdk');
-var co = require('co');
-
 
 var settings = {
     baseUrl: 'http://127.0.0.1:8000'
@@ -15,6 +13,10 @@ var routes = {
     "user.get": {
         method: "DELETE",
         uri: "/user/list/:id.:format/:enable"
+    },
+    "user.search": {
+        method: "DELETE",
+        uri: "/user/search"
     }};
 var api = new Sdk(settings, routes);
 
@@ -56,33 +58,25 @@ app.delete('/user/list/:id/:enable', function (req, res) {
     res.json(query);
 });
 
-var Promise = require('promise');
+app.delete('/user/search', function (req, res) {
+    res.status(404).send({status: false});
+});
+
+api.use(function (options, next) {
+    return next(new Error('hello'), options);
+});
+
 
 app.listen(8000, function () {
 
-    Promise.all([
-        api.user.get({id: 1000, format: 'json', enable: true, tag: 'test'}),
-        api.user.get({id: 2000, format: 'xml', enable: false}),
-        api.user.get({id: 3000, format: 'js', enable: true})
-    ]).then(function (body) {
-        console.log(body);
-    }, function (error) {
-        console.log(error);
-    });
-
-    var p=api.user.get({id: 1000, format: 'json00', enable: true, tag: 'test'});
-
-    p.then(function(value){
-        console.log(value);
-    });
-
-    p.then(function(value){
-        console.log(value);
-    });
-    p.then(function(value){
-        console.log(value);
-    });
+    api.user.get({id: 1000, format: 'json', enable: true, tag: 'test'})
+        .then(function (body) {
+            console.log(body);
+        }).catch(function (e) {
+            console.log(e);
+        });
 });
+
 
 
 
