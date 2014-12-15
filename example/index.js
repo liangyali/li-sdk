@@ -6,7 +6,6 @@ var Sdk = require('../lib/sdk');
 
 var settings = {
     baseUrl: 'http://127.0.0.1:8000'
-
 };
 
 var routes = {
